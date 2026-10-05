@@ -6,75 +6,75 @@
 
 # RATISS CYPHER ODV SCIENTIST V2
 
-**Agent scientifique autonome RATISS V9 Aeon Prime** — interface sécurisée multi-utilisateurs déployée sur Hugging Face Spaces (mode Docker).
+**RATISS V9 Aeon Prime autonomous scientific agent** — secure multi-user interface deployed on Hugging Face Spaces (Docker mode).
 
-> Propriété Intellectuelle : **JohnKing0 & Architecte Jonathan Evina**
-> ORCID : [0009-0000-4092-5313](https://orcid.org/0009-0000-4092-5313) — DOI : [10.17605/OSF.IO/6JZMB](https://doi.org/10.17605/OSF.IO/6JZMB)
+> Intellectual Property: **JohnKing0 & Architect Jonathan Evina**
+> ORCID: [0009-0000-4092-5313](https://orcid.org/0009-0000-4092-5313) — DOI: [10.17605/OSF.IO/6JZMB](https://doi.org/10.17605/OSF.IO/6JZMB)
 
 ---
 
 ## 1. Architecture
 
-Le système est organisé en quatre couches principales. La couche d'**interface** repose sur Chainlit et expose une conversation en français avec une boucle agentique REACT. La couche **LLM** interroge NVIDIA **Nemotron 3 Ultra** (550B A55B, version `:free`) via OpenRouter, avec `openrouter/auto` en repli configuré par la variable `OPENROUTER_MODEL`. La couche **cerveau scientifique** contient le noyau RATISS : diagonalisation de Lanczos (modèle t-J exact), homologie persistante (nombres de Betti) sur les structures protéiques, reçus ZK-STARK, et le routage sémantique TransDIPL'Y avec le Panthéon des 30 Pairs. Enfin, la couche **sécurité native** garantit des sessions UUID isolées avec workspaces dédiés et un stockage des jetons uniquement en hachage SHA-256.
+The system is organized in four main layers. The **interface** layer relies on Chainlit and exposes a French-language conversation with a REACT agentic loop. The **LLM** layer queries NVIDIA **Nemotron 3 Ultra** (550B A55B, `:free` version) through OpenRouter, with `openrouter/auto` as fallback configured by the `OPENROUTER_MODEL` variable. The **scientific brain** layer contains the RATISS core: Lanczos diagonalization (exact t-J model), persistent homology (Betti numbers) on protein structures, ZK-STARK receipts, and the TransDIPL'Y semantic routing with the Pantheon of 30 Peers. Finally, the **native security** layer guarantees isolated UUID sessions with dedicated workspaces and token storage in SHA-256 hash only.
 
-| Dossier | Rôle |
+| Folder | Role |
 |---|---|
-| `app.py` | Interface Chainlit + boucle agentique REACT (point d'entrée HF Spaces) |
-| `src/ratiss_v9_aeon_prime/` | Cerveau scientifique RATISS (physique, topologie, agent, CLI) |
-| `src/connectors/` | Connecteurs quantiques (IBM Quantum, Quandela, PennyLane, fallback CPU) |
-| `security/` | Gestionnaire de sessions (UUID, SQLite, isolation) et coffre-fort de jetons SHA-256 |
-| `scripts/` | `import_skill.py` (import de skills GitHub) et `align_agent.py` (alignement Nemotron) |
-| `docs/` | Mémoire agentique `AGENTS.md` |
+| `app.py` | Chainlit interface + REACT agentic loop (HF Spaces entry point) |
+| `src/ratiss_v9_aeon_prime/` | RATISS scientific brain (physics, topology, agent, CLI) |
+| `src/connectors/` | Quantum connectors (IBM Quantum, Quandela, PennyLane, CPU fallback) |
+| `security/` | Session manager (UUID, SQLite, isolation) and SHA-256 token vault |
+| `scripts/` | `import_skill.py` (GitHub skill import) and `align_agent.py` (Nemotron alignment) |
+| `docs/` | Agentic memory `AGENTS.md` |
 
-## 2. Sécurité native
+## 2. Native security
 
-Chaque utilisateur obtient à la connexion une **session UUID4** avec un jeton d'accès fort qui n'est remis qu'une seule fois et jamais stocké en clair : seul son **hachage SHA-256** est persisté dans `data/sessions.db`. Les workspaces sont strictement isolés (`workspace/{session_id}/`) et les sessions expirent par défaut après 24 heures (configurable via `SESSION_TTL_HOURS`). Les clés API sont vérifiées par comparaison de hachage (`security/token_vault.py`) et ne transitent jamais dans les logs ou les réponses de l'agent.
+Each user gets at login a **UUID4 session** with a strong access token that is handed over only once and never stored in clear: only its **SHA-256 hash** is persisted in `data/sessions.db`. Workspaces are strictly isolated (`workspace/{session_id}/`) and sessions expire by default after 24 hours (configurable via `SESSION_TTL_HOURS`). API keys are verified by hash comparison (`security/token_vault.py`) and never transit through logs or the agent's answers.
 
-## 3. Déploiement Hugging Face Spaces
+## 3. Hugging Face Spaces deployment
 
-1. Créez un nouveau Space en mode **Docker** sur [huggingface.co/spaces](https://huggingface.co/spaces).
-2. Reliez le dépôt GitHub `ratiss-cypher-odv-scientist-v2` (Settings → Linked resources).
-3. Ajoutez les **secrets** du dépôt (Settings → Repository secrets) :
+1. Create a new Space in **Docker** mode on [huggingface.co/spaces](https://huggingface.co/spaces).
+2. Link the GitHub repository `ratiss-cypher-odv-scientist-v2` (Settings → Linked resources).
+3. Add the repository **secrets** (Settings → Repository secrets):
 
-| Secret | Valeur |
+| Secret | Value |
 |---|---|
-| `OPENROUTER_API_KEY` | Clé OpenRouter (commençant par `sk-or-v1-`) |
+| `OPENROUTER_API_KEY` | OpenRouter key (starting with `sk-or-v1-`) |
 | `OPENROUTER_MODEL` | `nvidia/nemotron-3-ultra-550b-a55b:free` |
 | `OPENROUTER_BASE_URL` | `https://openrouter.ai/api/v1` |
-| `CHAINLIT_AUTH_SECRET` | Secret JWT (générable avec `chainlit create-secret`) |
-| `IBM_QUANTUM_TOKEN` | (optionnel) Jeton IBM Quantum |
-| `QUANDELA_API_TOKEN` | (optionnel) Jeton Quandela |
+| `CHAINLIT_AUTH_SECRET` | JWT secret (generable with `chainlit create-secret`) |
+| `IBM_QUANTUM_TOKEN` | (optional) IBM Quantum token |
+| `QUANDELA_API_TOKEN` | (optional) Quandela token |
 
-4. L'espace démarre automatiquement sur le port 7860.
+4. The Space starts automatically on port 7860.
 
-## 4. Utilisation locale
+## 4. Local usage
 
 ```bash
 # Configuration
-cp .env.example .env      # éditez .env avec vos clés
+cp .env.example .env      # edit .env with your keys
 python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 
-# Alignement de l'agent (vérifie clés + cerveau + Nemotron)
+# Agent alignment (checks keys + brain + Nemotron)
 python3 scripts/align_agent.py --full
 
-# Lancement de l'interface
+# Launching the interface
 CHAINLIT_AUTH_SECRET=$(chainlit create-secret) chainlit run app.py --port 8000
 ```
 
-## 5. Outils scientifiques exposés
+## 5. Exposed scientific tools
 
-| Outil | Description |
+| Tool | Description |
 |---|---|
-| `solve_quantum` | Pipeline RATISS complet : Lanczos t-J, homologie persistante, reçu ZK-STARK |
-| `route_task` | Routage sémantique TransDIPL'Y (domaine, solveur, pairs experts) |
-| `pdb_meta` | Métadonnées RCSB PDB d'une structure protéique |
-| `health` | Diagnostic du nœud (RAM, Memory Guard 7.5 Go) |
+| `solve_quantum` | Full RATISS pipeline: Lanczos t-J, persistent homology, ZK-STARK receipt |
+| `route_task` | TransDIPL'Y semantic routing (domain, solver, expert peers) |
+| `pdb_meta` | RCSB PDB metadata of a protein structure |
+| `health` | Node diagnostics (RAM, 7.5 GB Memory Guard) |
 
-## 6. Import de nouvelles compétences
+## 6. Importing new skills
 
 ```bash
-python3 scripts/import_skill.py https://github.com/owner/repo.git [--name nom]
+python3 scripts/import_skill.py https://github.com/owner/repo.git [--name name]
 ```
 
-Le script clone le dépôt dans `skills/`, détecte le point d'entrée, installe les dépendances et génère un `skill_config.json` standardisé consommé par l'orchestrateur.
+The script clones the repository into `skills/`, detects the entry point, installs the dependencies and generates a standardized `skill_config.json` consumed by the orchestrator.
